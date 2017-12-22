@@ -6,6 +6,7 @@ import SimpleSelect from './SimpleSelect';
 import Select from 'material-ui/Select';
 import Input, { InputLabel } from 'material-ui/Input';
 import { MenuItem } from 'material-ui/Menu';
+import DropdownOptions from './DropdownOptions.js';
 
 const styles = {
   margin:'50px'
@@ -18,17 +19,21 @@ const formStyles = {
 class TipForm extends React.Component {
   constructor (props){
     super(props);
-    this.state = {value: '', title: '',age: ''};
+    this.state = {value: '', title: '',selectedValue: '', categories: []};
 
     this.handleChange = this.handleChange.bind(this);
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
   handleChange(event) {
-    // console.log("changed")
-    this.setState({value: event.target.value});
-    this.setState({title: event.target.title});
-    // console.log(this.state.value)
+    console.log("changed")
+    this.setState({value: event.target.value, title: event.target.title, selectedValue: event.target.category});
+  }
+
+  componentDidMount() {
+    fetch('/tips/get_all_categories')
+    .then((response) => response.json())
+    .then((categories) => this.setState({categories: categories}))
   }
 
 
@@ -50,37 +55,38 @@ class TipForm extends React.Component {
   }
 
   render () {
+    console.log(this.state.title)
     return (
       <div>
 
       <form onSubmit={this.handleSubmit} style={styles} >
         <TextField
+          label="Title"
           placeholder="Enter Title"
           fullWidth={true}
           value={this.state.title}
           onChange={this.handleChange}
-        /><br/><br/>
-      <TextField
-        placeholder="Enter Tip"
-        fullWidth={true}
-        rows={10}
-        multiline={true}
-        value={this.state.value}
-        onChange={this.handleChange}
-      />
-      <br/>
-      <br/>
+        />
+        <br/><br/>
+        <TextField
+          label="Tip"
+          placeholder="Enter Tip"
+          fullWidth={true}
+          rows={10}
+          multiline={true}
+          value={this.state.value}
+          onChange={this.handleChange}
+        />
+        <br/><br/>
+      <InputLabel htmlFor="category">Category</InputLabel>
       <Select style={formStyles}
-        value={this.state.age}
+        label="Category"
+        value={this.state.selectedValue}
         onChange={this.handleChange}
-        input={<Input name="age" id="age-simple" />}
+        input={<Input name="category" id="category" />}
       >
-        <MenuItem value="">
-          <em>None</em>
-        </MenuItem>
-        <MenuItem value={10}>Ten</MenuItem>
-        <MenuItem value={20}>Twenty</MenuItem>
-        <MenuItem value={30}>Thirty</MenuItem>
+        <DropdownOptions list={this.state.categories} label="Category" selected={this.state.selectedValue}/>
+
       </Select>
       <br/>
       <br/>
