@@ -9,11 +9,10 @@ import CardCollection from './CardCollection.js';
 const navStyles = {
   margin:'50px'
 }
-
-
 class TipSearch extends React.Component {
   constructor (props){
     super(props);
+
     this.state = {
       value: '',
       ids: [],
@@ -24,41 +23,46 @@ class TipSearch extends React.Component {
   }
 
   handleChange(event) {
-    this.setState({value: event.target.value});
-    if (event.target.value.length > 0){
-      this.setState({ids:
-        this.state.tips.filter((element) => element.title.indexOf(event.target.value) !== -1 )
-      });
-    } else {
-      this.setState({ids: []});
-    }
+    const { value } = event.target;
 
+    if (value && value.length > 0) {
+      this.setState((prevState, props) => ({
+        value,
+        ids: prevState.tips.filter((element) => element.title.toLowerCase().indexOf(value.toLowerCase()) !== -1)
+      }));
+    } else {
+      this.setState({ value, ids: [] });
+    }
   }
 
   componentDidMount() {
     fetch('/tips/get_all_tips')
-    .then((response) => response.json())
-    .then((tips) => this.setState({tips: tips}))
+      .then(response => response.json())
+      .then(tips => this.setState({ tips }))
   }
 
-
   render () {
-    console.log(this.state.ids)
+    const { ids, value } = this.state;
+   
+    console.group("Tip Search");
+    console.debug(`ids: ${ids}`);
+    console.debug(`value: ${value}`);
+    console.groupEnd()
+
     return (
       <div>
+        <form onSubmit={this.handleSubmit} style={navStyles} >
+          <TextField
+            placeholder="Search"
+            fullWidth={true}
+            value={value}
+            onChange={this.handleChange}
+          />
+          <br/>
+        </form>
 
-      <form onSubmit={this.handleSubmit} style={navStyles} >
-        <TextField
-          placeholder="Search"
-          fullWidth={true}
-          value={this.state.value}
-          onChange={this.handleChange}
-        />
-        <br/>
-      </form>
-
-      <CardCollection tips={this.state.ids} />
-    </div>
+        <CardCollection tips={ids} />
+      </div>
     )
   }
 }

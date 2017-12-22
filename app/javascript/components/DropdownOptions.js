@@ -5,35 +5,45 @@ import { MenuItem } from 'material-ui/Menu';
 class DropdownOptions extends React.Component{
   constructor (props){
     super(props);
-    this.state = {
-      list: props.list,
-      size: props.list.length,
-      label: props.list.label,
-      selected: props.list.selected
-    };
+    // not sure where this is being used, so havent tested it, but it should work like this, 
+    // if not set the result of flattenProps to a variable then spread it in.
+    this.state = { ...this.flattenProps(props) };
   }
+
   componentWillReceiveProps(newProps){
-    this.setState({list: newProps.list});
-    this.setState({size: newProps.list.length});
-    this.setState({label: newProps.list.label});
-    this.setState({selected: newProps.selected});
+    if (this.props !== newProps) {
+      this.setState({ ...this.flattenProps(newProps) });
+    }
+  }
+
+  flattenProps = (props) => {
+    const { list, selected } = newProps;
+    const size = list.length;
+    const label = list.label;
+    return { list, selected, size, label };
   }
 
   render(){
-    var collection = []
-    collection.push(<div><MenuItem value="" >Choose {this.state.label}</MenuItem></div>);
-    let i = 0
-    for (i=0;i<this.state.size;i++) {
-      console.log(this.state.list[i]);
-
-      <MenuItem value={10}>Ten</MenuItem>
-      collection.push(<div><MenuItem key={this.state.list[i].id} value={this.state.list[i].id} >{this.state.list[i].name}</MenuItem></div>);
-    }
-
+    const { label, list } = this.state;
     return (
-    <div>
-      {collection}
-    </div>
+      <div>
+        <MenuItem value="" >
+          Choose {label}
+        </MenuItem>
+        {list.map(item => {
+          return (
+            <div key={item.id}>
+              <MenuItem value={10}>Ten</MenuItem>
+              <MenuItem 
+                key={`@mi${item.id}`} 
+                value={item.id}
+              >
+                {item.name}
+              </MenuItem>
+            </div>
+          );
+        })}
+      </div>
     )
   }
 }

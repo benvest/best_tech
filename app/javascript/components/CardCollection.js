@@ -5,28 +5,31 @@ import SimpleCard from './SimpleCard.js'
 class CardCollection extends React.Component{
   constructor (props){
     super(props);
-    this.state = {
-      tips: props.tips,
-      size: props.tips.length
-    };
+    const { tips } = props;
+    this.state = { tips, size: tips.length };
   }
+
   componentWillReceiveProps(newProps){
-    this.setState({tips: newProps.tips});
-    this.setState({size: newProps.tips.length});
+    const { tips } = newProps;
+    this.setState({ tips, size: tips.length });
   }
 
   render(){
-    var collection = []
-    let i = 0
-    for (i=0;i<this.state.size;i++) {
-      console.log(this.state.tips[i]);
-      collection.push(<div><SimpleCard tipTitle={this.state.tips[i].title} tipDescription={this.state.tips[i].description}/></div>);
-    }
+    const { tips } = this.state;
 
     return (
-    <div>
-      {collection}
-    </div>
+      <div>
+        {tips.map(tip => {
+          // might not need the div even
+          return (
+            <SimpleCard
+              key={tip.id}
+              tipTitle={tip.title} 
+              tipDescription={tip.description}
+            />
+          )
+        })}
+      </div>
     )
   }
 }
