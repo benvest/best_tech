@@ -26,75 +26,82 @@ class TipForm extends React.Component {
   }
 
   handleChange(event) {
-    console.log("changed")
-    this.setState({value: event.target.value, title: event.target.title, selectedValue: event.target.category});
+    const { value, title, category } = event.target;
+    this.setState({
+      value,
+      title,
+      selectedValue: category
+    });
   }
 
   componentDidMount() {
     fetch('/tips/get_all_categories')
-    .then((response) => response.json())
-    .then((categories) => this.setState({categories: categories}))
+      .then(response => response.json())
+      .then(categories => this.setState({ categories }))
   }
 
-
-
-  handleSubmit(event) {
-    const val = this.state.value
+  async handleSubmit(event) {
+    const { value } = this.state;
     event.preventDefault();
 
-    fetch('/pages/create',
-    {method: 'post',
-    headers: {
-      'Accept': 'application/json',
-      'Content-Type': 'application/json',
-    },
+    const response = await fetch('/pages/create', {
+      method: 'post',
+      headers: {
+        'Accept': 'application/json',
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({ description: value })
+    });
 
-    body: JSON.stringify({description: val})})
-    .then((response) => response.json())
-    .then((value) => this.setState({value: name}))
+    const json = await response.json();
+
+    this.setState({ value: json.name });
   }
 
   render () {
-    console.log(this.state.title)
+    const { title, value, selectedValue, categories } = this.state;
+
     return (
       <div>
-
-      <form onSubmit={this.handleSubmit} style={styles} >
-        <TextField
-          label="Title"
-          placeholder="Enter Title"
-          fullWidth={true}
-          value={this.state.title}
+        <form onSubmit={this.handleSubmit} style={styles} >
+          <TextField
+            label="Title"
+            placeholder="Enter Title"
+            fullWidth={true}
+            value={title}
+            onChange={this.handleChange}
+          />
+          <br/><br/>
+          <TextField
+            label="Tip"
+            placeholder="Enter Tip"
+            fullWidth={true}
+            rows={10}
+            multiline={true}
+            value={value}
+            onChange={this.handleChange}
+          />
+          <br/><br/>
+        <InputLabel htmlFor="category">Category</InputLabel>
+        <Select style={formStyles}
+          label="Category"
+          value={selectedValue}
           onChange={this.handleChange}
-        />
-        <br/><br/>
-        <TextField
-          label="Tip"
-          placeholder="Enter Tip"
-          fullWidth={true}
-          rows={10}
-          multiline={true}
-          value={this.state.value}
-          onChange={this.handleChange}
-        />
-        <br/><br/>
-      <InputLabel htmlFor="category">Category</InputLabel>
-      <Select style={formStyles}
-        label="Category"
-        value={this.state.selectedValue}
-        onChange={this.handleChange}
-        input={<Input name="category" id="category" />}
-      >
-        <DropdownOptions list={this.state.categories} label="Category" selected={this.state.selectedValue}/>
+          input={<Input name="category" id="category" />}
+        >
+          <DropdownOptions 
+            list={categories} 
+            label="Category" 
+            selected={selectedValue}
+          />
+        </Select>
+        <br/>
+        <br/>
 
-      </Select>
-      <br/>
-      <br/>
+        <Button type="submit" raised >Submit </Button>
 
-      <Button type="submit" raised >Submit </Button>
-
-      </form>
-    </div>
+        </form>
+      </div>
     )
   }
 }
