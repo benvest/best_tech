@@ -17,7 +17,7 @@ class DropdownOptions extends React.Component{
   }
 
   flattenProps = (props) => {
-    const { list, selected } = newProps;
+    const { list, selected } = props;
     const size = list.length;
     const label = list.label;
     return { list, selected, size, label };
@@ -27,13 +27,9 @@ class DropdownOptions extends React.Component{
     const { label, list } = this.state;
     return (
       <div>
-        <MenuItem value="" >
-          Choose {label}
-        </MenuItem>
         {list.map(item => {
           return (
             <div key={item.id}>
-              <MenuItem value={10}>Ten</MenuItem>
               <MenuItem 
                 key={`@mi${item.id}`} 
                 value={item.id}

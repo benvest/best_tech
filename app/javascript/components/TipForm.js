@@ -25,14 +25,9 @@ class TipForm extends React.Component {
     this.handleSubmit = this.handleSubmit.bind(this);
   }
 
-  handleChange(event) {
-    const { value, title, category } = event.target;
-    this.setState({
-      value,
-      title,
-      selectedValue: category
-    });
-  }
+  handleChange = prop => event => {
+    this.setState({ [prop]: event.target.value });
+  };
 
   componentDidMount() {
     fetch('/tips/get_all_categories')
@@ -40,22 +35,24 @@ class TipForm extends React.Component {
       .then(categories => this.setState({ categories }))
   }
 
-  async handleSubmit(event) {
+  handleSubmit(event) {
     const { value } = this.state;
     event.preventDefault();
 
-    const response = await fetch('/pages/create', {
+    fetch('/pages/create', {
       method: 'post',
       headers: {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ description: value })
+    }).then(response => {
+      console.log(response)
+      return response.json()
+    }).then(json => {
+      console.log(json)
+      this.setState({ value: json.name })
     });
-
-    const json = await response.json();
-
-    this.setState({ value: json.name });
   }
 
   render () {
@@ -69,7 +66,7 @@ class TipForm extends React.Component {
             placeholder="Enter Title"
             fullWidth={true}
             value={title}
-            onChange={this.handleChange}
+            onChange={this.handleChange('title')}
           />
           <br/><br/>
           <TextField
@@ -79,21 +76,27 @@ class TipForm extends React.Component {
             rows={10}
             multiline={true}
             value={value}
-            onChange={this.handleChange}
+            onChange={this.handleChange('value')}
           />
           <br/><br/>
         <InputLabel htmlFor="category">Category</InputLabel>
-        <Select style={formStyles}
+        <Select 
+          style={formStyles}
           label="Category"
           value={selectedValue}
-          onChange={this.handleChange}
+          onChange={this.handleChange('selectedValue')}
           input={<Input name="category" id="category" />}
         >
-          <DropdownOptions 
-            list={categories} 
-            label="Category" 
-            selected={selectedValue}
-          />
+          {categories.map(item => {
+            return (
+              <MenuItem 
+                key={`@mi${item.id}`} 
+                value={item.id}
+              >
+                  {item.name}
+               </MenuItem>
+            );
+          })}
         </Select>
         <br/>
         <br/>
